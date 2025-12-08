@@ -1,0 +1,36 @@
+"""
+Problem
+-------
+Parse “show ip route” for key fields.
+
+Example:
+O        10.1.1.0/24 [110/2] via 192.168.1.1, GigabitEthernet0/1
+
+Concepts Practiced
+------------------
+- Extracting protocol, prefix, AD/metric, next-hop, interface
+- Useful in routing audits
+"""
+
+import re
+
+route_pattern = re.compile(
+    r'^(?P<proto>[A-Z]\w?)\s+(?P<prefix>\S+)\s+\[(?P<ad>\d+)/(?P<metric>\d+)\]\s+via\s+(?P<nh>\d+\.\d+\.\d+\.\d+),\s+(?P<intf>\S+)'
+)
+
+def parse_routes(lines: list[str]) -> list[dict]:
+    routes = []
+    for l in lines:
+        m = route_pattern.match(l.strip())
+        if m:
+            routes.append(m.groupdict())
+    return routes
+
+
+if __name__ == "__main__":
+    sample = [
+        "O        10.1.1.0/24 [110/2] via 192.168.1.1, Gig0/1",
+        "B        172.16.0.0/16 [20/0] via 10.0.0.1, Gi0/2",
+    ]
+    print(parse_routes(sample))
+
