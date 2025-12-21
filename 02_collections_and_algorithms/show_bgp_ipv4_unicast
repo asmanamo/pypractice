@@ -1,0 +1,44 @@
+# Assume 'parsed_output' is the dictionary returned by Genie
+#show bgp ipv4 unicast
+parsed_output = {
+  "bgp": {
+    "routes": {
+      "10.1.1.0/24": {
+        "next_hop": "192.168.0.1",
+        "as_path": ["65001", "65002"],
+        "origin": "IGP",
+        "local_pref": 100,
+        "med": 20,
+        "community": ["no-export"],
+        "best_path": True
+      },
+      "10.2.2.0/24": {
+        "next_hop": "192.168.0.2",
+        "as_path": ["65003"],
+        "origin": "IGP",
+        "local_pref": 200,
+        "best_path": True
+      }
+    }
+  }
+}
+
+# 1. Print all prefixes
+for prefix in parsed_output["bgp"]["routes"]:
+    print("Prefix:", prefix)
+
+# 2. Access next-hop for a specific prefix
+print("Next-hop for 10.1.1.0/24:", parsed_output["bgp"]["routes"]["10.1.1.0/24"]["next_hop"])
+
+# 3. Filter prefixes by MED
+for prefix, attrs in parsed_output["bgp"]["routes"].items():
+    if "med" in attrs and attrs["med"] < 50:
+        print(f"{prefix} has MED {attrs['med']}")
+
+# 4. Find the best path prefix(es)
+best_paths = [p for p, attrs in parsed_output["bgp"]["routes"].items() if attrs.get("best_path")]
+print("Best path prefixes:", best_paths)
+
+# 5. Extract AS paths
+for prefix, attrs in parsed_output["bgp"]["routes"].items():
+    print(f"{prefix} AS Path: {' '.join(attrs['as_path'])}")
